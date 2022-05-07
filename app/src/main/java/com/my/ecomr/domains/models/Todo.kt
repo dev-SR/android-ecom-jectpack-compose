@@ -1,4 +1,4 @@
-package com.my.ecomr.models
+package com.my.ecomr.domains.models
 
 import com.google.firebase.firestore.DocumentId
 

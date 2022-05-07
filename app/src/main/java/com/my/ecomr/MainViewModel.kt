@@ -5,8 +5,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.my.ecomr.models.Todo
-import com.my.ecomr.models.services.TodoRepository
+import com.my.ecomr.domains.models.Todo
+import com.my.ecomr.domains.services.TodoRepository
 import com.example.ecomzapp.navigations.Screens
 import com.google.firebase.auth.AuthCredential
 import com.google.firebase.auth.FirebaseAuth
@@ -58,6 +58,9 @@ class MainViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val auth: FirebaseAuth = Firebase.auth
+//    private val _todos = mutableStateOf<Response<List<Todo>>>(Response.Loading)
+//    val todos: State<Response<List<Todo>>> = _todos
+
 
     private val _todos = mutableStateOf<Response<List<Todo>>>(Response.Loading)
     val todos: State<Response<List<Todo>>> = _todos

@@ -1,8 +1,8 @@
-package com.my.ecomr.models.services
+package com.my.ecomr.domains.services
 
 import com.my.ecomr.Response
-import com.example.ecomzapp.di.TodoRef
-import com.my.ecomr.models.Todo
+import com.my.ecomr.di.TodoRef
+import com.my.ecomr.domains.models.Todo
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.ktx.toObjects
 import kotlinx.coroutines.channels.awaitClose

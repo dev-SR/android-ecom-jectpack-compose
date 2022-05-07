@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.animation.doOnEnd
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import com.my.ecomr.models.Todo
+import com.my.ecomr.domains.models.Todo
 import com.example.ecomzapp.navigations.BuildNavigation
 import com.example.ecomzapp.navigations.Screens
 import com.my.ecomr.ui.components.common.TopBar

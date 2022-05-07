@@ -1,7 +1,7 @@
-package com.example.ecomzapp.di
+package com.my.ecomr.di
 
 
-import com.my.ecomr.models.services.TodoRepository
+import com.my.ecomr.domains.services.TodoRepository
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.Module
