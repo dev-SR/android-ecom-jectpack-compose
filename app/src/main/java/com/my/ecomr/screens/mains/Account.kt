@@ -13,6 +13,7 @@ import androidx.navigation.NavController
 import com.my.ecomr.MainViewModel
 import com.example.ecomzapp.navigations.Screens
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.my.ecomr.Response
 
 
 @Composable
@@ -20,14 +21,15 @@ fun AccountScreen(navController: NavController, viewModel: MainViewModel) {
     viewModel.setCurrentScreen(Screens.HomeScreens.Account)
     val systemUiController = rememberSystemUiController()
     systemUiController.setStatusBarColor(Color.Black)
-    val isLoggedIn = viewModel.isLoggedIn.collectAsState()
+    val isLoggedIn = viewModel.isLoggedIn.value
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Text(text = "AccountScreen", style = MaterialTheme.typography.h3)
-        if (!isLoggedIn.value) {
+
+        if (!isLoggedIn) {
             Button(
                 onClick = {
                     viewModel.logout()
@@ -39,7 +41,15 @@ fun AccountScreen(navController: NavController, viewModel: MainViewModel) {
                 }) {
                 Text(text = "Login")
             }
-        } else
+        } else {
+            Text(
+                text = (viewModel.user.value?.displayName.toString()),
+                style = MaterialTheme.typography.body2
+            )
+            Text(
+                text = (viewModel.user.value?.email.toString()),
+                style = MaterialTheme.typography.caption
+            )
             Button(
                 onClick = {
                     viewModel.logout()
@@ -51,6 +61,9 @@ fun AccountScreen(navController: NavController, viewModel: MainViewModel) {
                 }) {
                 Text(text = "Logout")
             }
+
+
+        }
     }
 }
 

@@ -18,7 +18,6 @@ import com.my.ecomr.MainViewModel
 import com.my.ecomr.Product
 import com.example.ecomzapp.navigations.Screens
 import com.my.ecomr.ui.components.product.QtyUi
-import com.my.ecomr.user
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
@@ -28,7 +27,7 @@ fun CartScreen(
     viewModel.setCurrentScreen(Screens.HomeScreens.Cart)
     val systemUiController = rememberSystemUiController()
     systemUiController.setStatusBarColor(Color.Black)
-    val isLoggedIn = viewModel.isLoggedIn.collectAsState()
+    val isLoggedIn = viewModel.isLoggedIn.value
     val cartInfo = viewModel.cartInfo
     val cartItem = viewModel.cartInfo.value?.cartItems
     val value = viewModel.value.collectAsState()
@@ -36,13 +35,13 @@ fun CartScreen(
     Log.d("debug", cartItem.toString())
 
     LaunchedEffect(key1 = true) {
-        if (!isLoggedIn.value) {
+        if (!isLoggedIn) {
             navController.navigate(Screens.AuthScreens.Login.reroute("cart", null)) {
                 popUpTo(Screens.HomeScreens.Home.route)
             }
         }
         productId?.let {
-            viewModel.addToCart(user = user, Product(productId!!, productId), qty = 1)
+//            viewModel.addToCart(user = user, Product(productId!!, productId), qty = 1)
         }
     }
 

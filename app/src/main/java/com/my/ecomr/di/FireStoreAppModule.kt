@@ -1,15 +1,24 @@
 package com.my.ecomr.di
 
 
+import android.content.Context
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.firebase.auth.ktx.auth
 import com.my.ecomr.domains.services.TodoRepository
 import com.google.firebase.firestore.CollectionReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
+import com.my.ecomr.BuildConfig
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Qualifier
+import javax.inject.Singleton
 
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
@@ -44,6 +53,12 @@ object FireStoreAppModule {
         @TodoRef
         todoRef: CollectionReference,
     ) = TodoRepository(todoRef)
+
+    // How to construct AuthRepository?
+    @Provides
+    fun provideAuth() = Firebase.auth
+
+
 
 
 }

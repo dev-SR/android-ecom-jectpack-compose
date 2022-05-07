@@ -1,9 +1,9 @@
 package com.my.ecomr.screens.auths
 
-import android.content.Context
 import android.util.Log
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.IntentSenderRequest
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -16,11 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.ecomzapp.navigations.MAIN_ROUTE
 import com.my.ecomr.MainViewModel
 import com.example.ecomzapp.navigations.Screens
-import com.google.android.gms.auth.api.identity.BeginSignInRequest
-import com.google.android.gms.auth.api.identity.Identity
-import kotlinx.coroutines.tasks.await
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.common.api.ApiException
+import com.google.firebase.auth.GoogleAuthProvider
+import com.my.ecomr.Response
+import com.my.ecomr.domains.services.getGoogleSignInClient
 
 @Composable
 fun LoginScreen(
@@ -32,6 +35,62 @@ fun LoginScreen(
     viewModel.setCurrentScreen(Screens.AuthScreens.Login)
 
     val context = LocalContext.current
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.StartActivityForResult()) {
+            val task = GoogleSignIn.getSignedInAccountFromIntent(it.data)
+            try {
+                val account = task.getResult(ApiException::class.java)!!
+                val credential = GoogleAuthProvider.getCredential(account.idToken!!, null)
+                viewModel.signWithGoogleCredential(credential)
+            } catch (e: ApiException) {
+                Log.w("TAG", "Google sign in failed", e)
+            }
+        }
+
+    when (viewModel.authStatus.value) {
+        is Response.Loading  -> CircularProgressIndicator()
+        is Response.Success -> {
+            Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
+
+        }
+        is Response.Error -> {
+            Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
+        }
+
+    }
+
+    if (viewModel.isLoggedIn.value){
+        when (redirectTo) {
+            "checkout" -> {
+                navController.navigate(route = Screens.OrderScreens.Checkout.route) {
+                    popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
+                }
+            }
+            "cart" -> {
+                if (productId == null) {
+                    Log.d("route_g", "null-> " + productId.toString())
+                    navController.navigate(route = Screens.HomeScreens.Cart.route) {
+                        popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
+                    }
+                }
+//                    productId?.let {
+//                        Log.d("route_g", "not null -> $productId")
+//                        navController.navigate(
+//                            route = Screens.HomeScreens.Cart.addNewProductToCart(
+//                                productId = productId!!
+//                            )
+//                        ) {
+//                            popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
+//                        }
+//                    }
+            }
+            else -> {
+                navController.navigate(route = MAIN_ROUTE) {
+                    popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
+                }
+            }
+        }
+    }
 
 
 
@@ -55,38 +114,9 @@ fun LoginScreen(
         val scope = rememberCoroutineScope()
         Button(
             onClick = {
+                val googleSignInClient = getGoogleSignInClient(context)
+                launcher.launch(googleSignInClient.signInIntent)
 
-//                viewModel.login()
-//                when (redirectTo) {
-//                    "checkout" -> {
-//                        navController.navigate(route = Screens.OrderScreens.Checkout.route) {
-//                            popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
-//                        }
-//                    }
-//                    "cart" -> {
-//                        if (productId == null) {
-//                            Log.d("route_g", "null-> " + productId.toString())
-//                            navController.navigate(route = Screens.HomeScreens.Cart.route) {
-//                                popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
-//                            }
-//                        }
-//                        productId?.let {
-//                            Log.d("route_g", "not null -> $productId")
-//                            navController.navigate(
-//                                route = Screens.HomeScreens.Cart.addNewProductToCart(
-//                                    productId = productId!!
-//                                )
-//                            ) {
-//                                popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
-//                            }
-//                        }
-//                    }
-//                    else -> {
-//                        navController.navigate(route = MAIN_ROUTE) {
-//                            popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
-//                        }
-//                    }
-//                }
             }
         )
         {
@@ -110,40 +140,5 @@ fun LoginScreen(
                 },
             )
         }
-    }
-}
-
-
-suspend fun signIn(
-    context: Context,
-    launcher: ActivityResultLauncher<IntentSenderRequest>
-) {
-    val oneTapClient = Identity.getSignInClient(context)
-    val signInRequest = BeginSignInRequest.builder()
-        .setGoogleIdTokenRequestOptions(
-            BeginSignInRequest.GoogleIdTokenRequestOptions.builder()
-                .setSupported(true)
-                // Your server's client ID, not your Android client ID.
-                .setServerClientId("1043395628249-cun49dsv0ft58s36neuvae8souqtrs8d.apps.googleusercontent.com")
-                // Only show accounts previously used to sign in.
-                .setFilterByAuthorizedAccounts(true)
-                .build()
-        )
-        // Automatically sign in when exactly one credential is retrieved.
-        .setAutoSelectEnabled(true)
-        .build()
-
-    try {
-        // Use await() from https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-play-services
-        // Instead of listeners that aren't cleaned up automatically
-        val result = oneTapClient.beginSignIn(signInRequest).await()
-
-        // Now construct the IntentSenderRequest the launcher requires
-        val intentSenderRequest = IntentSenderRequest.Builder(result.pendingIntent).build()
-        launcher.launch(intentSenderRequest)
-    } catch (e: Exception) {
-        // No saved credentials found. Launch the One Tap sign-up flow, or
-        // do nothing and continue presenting the signed-out UI.
-        Log.d("LOG", e.message.toString())
     }
 }

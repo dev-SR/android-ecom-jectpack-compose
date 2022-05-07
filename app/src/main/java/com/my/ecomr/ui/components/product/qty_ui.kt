@@ -16,7 +16,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.my.ecomr.CartItem
 import com.my.ecomr.MainViewModel
-import com.my.ecomr.user
 
 @Composable
 fun QtyUi(item: CartItem, viewModel: MainViewModel) {
@@ -33,7 +32,10 @@ fun QtyUi(item: CartItem, viewModel: MainViewModel) {
             verticalAlignment = Alignment.CenterVertically
         ) {
             val isLight = MaterialTheme.colors.isLight
-            IconButton(onClick = { viewModel.decreaseQty(product = item.product, user) }) {
+            IconButton(onClick = {
+//                viewModel.decreaseQty(product = item.product, user)
+
+            }) {
                 Icon(
                     imageVector = Icons.Rounded.Remove,
                     contentDescription = "Remove",
@@ -50,7 +52,11 @@ fun QtyUi(item: CartItem, viewModel: MainViewModel) {
 //                Spacer(modifier = Modifier.padding(5.dp))
             Text(text = "${item.qty}")
 //                Spacer(modifier = Modifier.padding(5.dp))
-            IconButton(onClick = { viewModel.increaseQty(item.product, user) }) {
+            IconButton(onClick = {
+
+//                viewModel.increaseQty(item.product, user)
+
+            }) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
                     contentDescription = "add",

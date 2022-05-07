@@ -36,7 +36,7 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel by viewModels<MainViewModel>()
-    val WEB_CLIENT_ID = BuildConfig.WEB_CLIENT_ID
+//    val WEB_CLIENT_ID = BuildConfig.WEB_CLIENT_ID
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
