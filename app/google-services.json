@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "766441510357",
+    "project_id": "ecomr-50fd2",
+    "storage_bucket": "ecomr-50fd2.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:766441510357:android:a50946115e42b0ecf9595c",
+        "android_client_info": {
+          "package_name": "com.my.ecomr"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "766441510357-iv64hgmne122auh592jlm1sc4fbe98re.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAesDTSjcMtidwN_zLKC4wzojXRFVUlvZc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "766441510357-iv64hgmne122auh592jlm1sc4fbe98re.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
