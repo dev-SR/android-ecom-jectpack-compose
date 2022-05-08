@@ -126,9 +126,7 @@ fun HomeScreen(
     seeAllPopular: () -> Unit = {},
     seeAllTop: () -> Unit = {},
     addToCart: () -> Unit = {},
-//    setCurrentScreen: (Screens) -> Unit = {}
 ) {
-//    setCurrentScreen(Screens.HomeScreens.Home)
 
     LazyColumn {
         item {

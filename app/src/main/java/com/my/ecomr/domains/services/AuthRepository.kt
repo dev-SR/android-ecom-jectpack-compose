@@ -19,14 +19,19 @@ class AuthRepository @Inject constructor(
     private val auth: FirebaseAuth,
 ) {
     fun getCurrentUser(): User? {
-        val firebaseUser = auth.currentUser
+        val firebaseUser: FirebaseUser? = auth.currentUser
         var user: User? = if (firebaseUser != null) {
-            User(firebaseUser.displayName!!, firebaseUser.email!!)
+            User(
+                firebaseUser.email!!,
+                firebaseUser.displayName!!,
+                firebaseUser.photoUrl?.toString()
+            )
         } else
             null
 
         return user
     }
+
 
     fun logOut() {
         auth.signOut()

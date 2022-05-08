@@ -88,6 +88,24 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun logout() {
+        viewModelScope.launch {
+            authRepository.logOut()
+            _isLoggedIn.value = false
+        }
+    }
+
+    fun signWithGoogleCredential(credential: AuthCredential) = viewModelScope.launch {
+        authRepository.signWithGoogleCredential(credential).collect { response ->
+            _authStatus.value = response
+            when (response) {
+                is Response.Success -> {
+                    _isLoggedIn.value = true
+                }
+                else -> null
+            }
+        }
+    }
     private fun getBooks() {
         viewModelScope.launch {
             todoRepository.getTodosFromFirestore().collect { response ->
@@ -185,17 +203,4 @@ class MainViewModel @Inject constructor(
 //        }
 //    }
 
-    fun logout() {
-        viewModelScope.launch {
-            authRepository.logOut()
-            _isLoggedIn.value = false
-        }
-    }
-
-    fun signWithGoogleCredential(credential: AuthCredential) = viewModelScope.launch {
-        authRepository.signWithGoogleCredential(credential).collect{ response ->
-            _authStatus.value = response
-            _isLoggedIn.value = true
-        }
-    }
 }

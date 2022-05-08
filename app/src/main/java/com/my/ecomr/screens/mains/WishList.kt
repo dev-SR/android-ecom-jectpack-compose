@@ -19,8 +19,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @Composable
 fun WishlistScreen(navController: NavController, viewModel: MainViewModel) {
     viewModel.setCurrentScreen(Screens.HomeScreens.WishList)
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(Color.Black)
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

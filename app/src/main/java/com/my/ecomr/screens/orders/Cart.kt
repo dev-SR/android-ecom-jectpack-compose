@@ -25,8 +25,7 @@ fun CartScreen(
     navController: NavController, viewModel: MainViewModel, productId: String? = null
 ) {
     viewModel.setCurrentScreen(Screens.HomeScreens.Cart)
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(Color.Black)
+
     val isLoggedIn = viewModel.isLoggedIn.value
     val cartInfo = viewModel.cartInfo
     val cartItem = viewModel.cartInfo.value?.cartItems

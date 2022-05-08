@@ -16,8 +16,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 @Composable
 fun CheckoutScreen(navController: NavController, viewModel: MainViewModel) {
     viewModel.setCurrentScreen(Screens.OrderScreens.Checkout)
-    val systemUiController = rememberSystemUiController()
-    systemUiController.setStatusBarColor(Color.Black)
+
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,

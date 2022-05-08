@@ -10,6 +10,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,97 +49,101 @@ fun LoginScreen(
         }
 
     when (viewModel.authStatus.value) {
-        is Response.Loading  -> CircularProgressIndicator()
+        is Response.Loading -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                CircularProgressIndicator()
+            }
+        }
         is Response.Success -> {
             Toast.makeText(context, "Login Success", Toast.LENGTH_SHORT).show()
-
         }
         is Response.Error -> {
             Toast.makeText(context, "Login Failed", Toast.LENGTH_SHORT).show()
         }
-
-    }
-
-    if (viewModel.isLoggedIn.value){
-        when (redirectTo) {
-            "checkout" -> {
-                navController.navigate(route = Screens.OrderScreens.Checkout.route) {
-                    popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
+        else -> {
+            Row(modifier = Modifier.fillMaxWidth()) {
+                IconButton(onClick = {
+                    navController.navigate(Screens.HomeScreens.Home.route) {
+//                popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
+                    }
+                }) {
+                    Icon(Icons.Filled.Close, contentDescription = "")
                 }
             }
-            "cart" -> {
-                if (productId == null) {
-                    Log.d("route_g", "null-> " + productId.toString())
-                    navController.navigate(route = Screens.HomeScreens.Cart.route) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                Text(text = "LoginPage", style = MaterialTheme.typography.h2)
+                Button(
+                    onClick = {
+                        val googleSignInClient = getGoogleSignInClient(context)
+                        launcher.launch(googleSignInClient.signInIntent)
+
+                    }
+                )
+                {
+                    Text(text = "Login")
+                }
+                Spacer(modifier = Modifier.size(10.dp))
+                Row {
+                    Text(text = "Not registered yet? ", style = MaterialTheme.typography.subtitle1)
+                    Text(
+                        text = "Create New Account",
+                        style = MaterialTheme.typography.subtitle1,
+                        color = MaterialTheme.colors.primary,
+                        modifier = Modifier.clickable {
+                            navController.popBackStack()
+                            navController.navigate(
+                                route = Screens.AuthScreens.Register.reroute(
+                                    redirectTo!!,
+                                    productId!!
+                                )
+                            )
+                        },
+                    )
+                }
+            }
+        }
+
+    }
+    LaunchedEffect(key1 = viewModel.isLoggedIn.value) {
+        if (viewModel.isLoggedIn.value) {
+            when (redirectTo) {
+                "checkout" -> {
+                    navController.navigate(route = Screens.OrderScreens.Checkout.route) {
                         popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
                     }
                 }
-//                    productId?.let {
-//                        Log.d("route_g", "not null -> $productId")
-//                        navController.navigate(
-//                            route = Screens.HomeScreens.Cart.addNewProductToCart(
-//                                productId = productId!!
-//                            )
-//                        ) {
-//                            popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
-//                        }
-//                    }
-            }
-            else -> {
-                navController.navigate(route = MAIN_ROUTE) {
-                    popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
+                "cart" -> {
+                    if (productId == null) {
+                        Log.d("route_g", "null-> " + productId.toString())
+                        navController.navigate(route = Screens.HomeScreens.Cart.route) {
+                            popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
+                        }
+                    }
+                    productId?.let {
+                        Log.d("route_g", "not null -> $productId")
+                        navController.navigate(
+                            route = Screens.HomeScreens.Cart.addNewProductToCart(
+                                productId = productId!!
+                            )
+                        ) {
+                            popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
+                        }
+                    }
+                }
+                else -> {
+                    navController.navigate(route = MAIN_ROUTE) {
+                        popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
+                    }
                 }
             }
-        }
-    }
-
-
-
-    Row(modifier = Modifier.fillMaxWidth()) {
-        IconButton(onClick = {
-            navController.navigate(Screens.HomeScreens.Home.route) {
-//                popUpTo(Screens.AuthScreens.Login.route) { inclusive = true }
-
-
-            }
-        }) {
-            Icon(Icons.Filled.Close, contentDescription = "")
-        }
-    }
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(text = "LoginPage", style = MaterialTheme.typography.h2)
-        val scope = rememberCoroutineScope()
-        Button(
-            onClick = {
-                val googleSignInClient = getGoogleSignInClient(context)
-                launcher.launch(googleSignInClient.signInIntent)
-
-            }
-        )
-        {
-            Text(text = "Login")
-        }
-        Spacer(modifier = Modifier.size(10.dp))
-        Row {
-            Text(text = "Not registered yet? ", style = MaterialTheme.typography.subtitle1)
-            Text(
-                text = "Create New Account",
-                style = MaterialTheme.typography.subtitle1,
-                color = MaterialTheme.colors.primary,
-                modifier = Modifier.clickable {
-                    navController.popBackStack()
-                    navController.navigate(
-                        route = Screens.AuthScreens.Register.reroute(
-                            redirectTo!!,
-                            productId!!
-                        )
-                    )
-                },
-            )
         }
     }
 }
