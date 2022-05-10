@@ -1,4 +1,4 @@
-package com.example.ecomzapp.navigations
+package com.my.ecomr.navigations
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*

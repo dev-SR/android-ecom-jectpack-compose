@@ -7,7 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
-import com.example.ecomzapp.navigations.Screens
+import com.my.ecomr.navigations.Screens
 
 @Composable
 fun TopBar(currentScreens: Screens, navController: NavHostController) {
@@ -24,12 +24,12 @@ fun TopBar(currentScreens: Screens, navController: NavHostController) {
             })
 
         }
-        Screens.ProductScreens.Details ->{
-            BuildTopBar(title = "Checkout", buttonIcon = Icons.Filled.ArrowBack, onButtonClicked = {
-                navController.popBackStack()
-            })
-
-        }
+//        Screens.ProductScreens.Details ->{
+//            BuildTopBar(title = "Checkout", buttonIcon = Icons.Filled.ArrowBack, onButtonClicked = {
+//                navController.popBackStack()
+//            })
+//
+//        }
         Screens.OrderScreens.Payment ->{
             BuildTopBar(title = "Payment", buttonIcon = Icons.Filled.ArrowBack, onButtonClicked = {
                 navController.popBackStack()

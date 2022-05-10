@@ -8,12 +8,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.my.ecomr.MainViewModel
-import com.example.ecomzapp.navigations.Screens
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.my.ecomr.navigations.Screens
 
 
 @Composable

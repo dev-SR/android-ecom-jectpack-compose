@@ -11,8 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.my.ecomr.MainViewModel
-import com.example.ecomzapp.navigations.MAIN_ROUTE
-import com.example.ecomzapp.navigations.Screens
+import com.my.ecomr.navigations.MAIN_ROUTE
+import com.my.ecomr.navigations.Screens
 
 @Composable
 fun RegisterScreen(

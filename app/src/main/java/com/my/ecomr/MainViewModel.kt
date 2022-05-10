@@ -7,15 +7,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.my.ecomr.domains.models.Todo
 import com.my.ecomr.domains.services.TodoRepository
-import com.example.ecomzapp.navigations.Screens
+import com.my.ecomr.navigations.Screens
 import com.google.firebase.auth.AuthCredential
+import com.my.ecomr.domains.models.Product
 import com.my.ecomr.domains.models.User
 import com.my.ecomr.domains.services.AuthRepository
+import com.my.ecomr.domains.services.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,9 +24,9 @@ import javax.inject.Inject
  */
 
 //data class User(var id: String, var name: String)
-data class Product(var id: String, var name: String)
-data class CartItem(var product: Product, var qty: Int)
-data class CartInfo(var userid: String, var cartItems: MutableList<CartItem>)
+//data class Product(var id: String, var name: String)
+//data class CartItem(var product: Product, var qty: Int)
+//data class CartInfo(var userid: String, var cartItems: MutableList<CartItem>)
 
 //val user = User("1", "Jhon")
 
@@ -50,9 +50,10 @@ sealed class Response<out T> {
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val cartService: CartService,
+//    private val cartService: CartService,
     private val todoRepository: TodoRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val productRepository: ProductRepository
 ) : ViewModel() {
     private val _isLoggedIn = mutableStateOf(false)
     val isLoggedIn: State<Boolean> = _isLoggedIn
@@ -62,6 +63,17 @@ class MainViewModel @Inject constructor(
     private val _user = mutableStateOf<User?>(null)
     val user: State<User?> = _user
 
+    private val _newArrivalProducts = mutableStateOf<Response<List<Product>>>(Response.Loading)
+    val newArrivalProducts: State<Response<List<Product>>> = _newArrivalProducts
+
+    private val _topProducts = mutableStateOf<Response<List<Product>>>(Response.Loading)
+    val topProducts: State<Response<List<Product>>> = _topProducts
+
+    private val _bestSellerProducts = mutableStateOf<Response<List<Product>>>(Response.Loading)
+    val bestSellerProducts: State<Response<List<Product>>> = _bestSellerProducts
+
+    private val _product = mutableStateOf<Response<Product>>(Response.Loading)
+    val product: State<Response<Product>> = _product
 
     private val _todos = mutableStateOf<Response<List<Todo>>>(Response.Loading)
     val todos: State<Response<List<Todo>>> = _todos
@@ -70,8 +82,8 @@ class MainViewModel @Inject constructor(
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
 
-    private val _cartInfo = mutableStateOf<CartInfo?>(null)
-    val cartInfo: State<CartInfo?> = _cartInfo
+//    private val _cartInfo = mutableStateOf<CartInfo?>(null)
+//    val cartInfo: State<CartInfo?> = _cartInfo
 
     private val _value = MutableStateFlow(0)
     val value: StateFlow<Int> = _value
@@ -86,6 +98,9 @@ class MainViewModel @Inject constructor(
             _isLoggedIn.value = true
             _user.value = user
         }
+        getProducts()
+        getTopProducts()
+        getBestSellers()
     }
 
     fun logout() {
@@ -106,12 +121,39 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-    private fun getBooks() {
+
+    private fun getProducts() {
         viewModelScope.launch {
-            todoRepository.getTodosFromFirestore().collect { response ->
-                _todos.value = response
+            productRepository.getProductsFromFirestore().collect { response ->
+                _newArrivalProducts.value = response
             }
         }
+    }
+
+    private fun getTopProducts() {
+        viewModelScope.launch {
+            productRepository.getTopProducts().collect { response ->
+                _topProducts.value = response
+            }
+        }
+    }
+
+    private fun getBestSellers() {
+        viewModelScope.launch {
+            productRepository.getBestSeller().collect { response ->
+                _bestSellerProducts.value = response
+            }
+        }
+    }
+
+    fun getProduct(productId: String) {
+        viewModelScope.launch {
+            productRepository.getProduct(productId).collect { response ->
+                _product.value = response
+            }
+        }
+
+
     }
 
     private val _currentScreen = MutableStateFlow<Screens>(Screens.HomeScreens.Home)
@@ -122,6 +164,7 @@ class MainViewModel @Inject constructor(
             _currentScreen.emit(screen)
         }
     }
+
 
 //    fun addToCart(user: User, product: Product, qty: Int) {
 //        viewModelScope.launch {

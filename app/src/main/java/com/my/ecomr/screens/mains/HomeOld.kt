@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.my.ecomr.MainViewModel
-import com.example.ecomzapp.navigations.Screens
+import com.my.ecomr.navigations.Screens
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 val lists = listOf("A", "B", "C", "D")

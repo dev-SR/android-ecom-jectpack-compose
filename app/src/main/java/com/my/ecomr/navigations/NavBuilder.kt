@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalAnimationApi::class)
 
-package com.example.ecomzapp.navigations
+package com.my.ecomr.navigations
 
 import android.util.Log
 import androidx.compose.animation.AnimatedContentScope
@@ -18,11 +18,11 @@ import com.example.ecomzapp.screens.mains.*
 import com.my.ecomr.screens.orders.CartScreen
 import com.my.ecomr.screens.orders.CheckoutScreen
 import com.my.ecomr.screens.orders.PaymentScreen
-import com.my.ecomr.screens.products.DetailsScreen
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.google.accompanist.navigation.animation.composable
 import com.google.accompanist.navigation.animation.navigation
 import com.my.ecomr.screens.mains.*
+import com.my.ecomr.screens.products.DetailsScreen
 
 @Composable
 fun BuildNavigation(viewModel: MainViewModel, navController: NavHostController) {
@@ -37,6 +37,7 @@ fun BuildNavigation(viewModel: MainViewModel, navController: NavHostController) 
     }
 }
 
+@OptIn(ExperimentalAnimationApi::class)
 fun NavGraphBuilder.homeGraph(navController: NavHostController, viewModel: MainViewModel) {
     navigation(startDestination = Screens.HomeScreens.Home.route, route = MAIN_ROUTE) {
         composable(
@@ -67,15 +68,16 @@ fun NavGraphBuilder.homeGraph(navController: NavHostController, viewModel: MainV
 //            }
 
         ) { back ->
-            Log.d("route_g", "Home: " + back.arguments.toString())
-            viewModel.setCurrentScreen(Screens.HomeScreens.Home)
+//            Log.d("route_g", "Home: " + back.arguments.toString())
+            HomeScreen(navController = navController, viewModel = viewModel)
 
-            HomeScreen(
-                heroProduct = heroProduct,
-                popularsNow = listOfProduct,
-                topProducts = listOfProduct,
-                categoryList = listOfCategory,
-            )
+
+//            HomeScreenLocal(
+//                heroProductLocal = heroProduct,
+//                popularsNow = listOfProduct,
+//                topProductLocals = listOfProduct,
+//                categoryLocalList = listOfCategory,
+//            )
 //            HomeScreenOld(navController = navController, viewModel = viewModel)
         }
         composable(

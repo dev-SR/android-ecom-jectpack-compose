@@ -28,6 +28,11 @@ annotation class TodoRef
 @Retention(AnnotationRetention.BINARY)
 annotation class OtherRef
 
+@Qualifier
+@Retention(AnnotationRetention.BINARY)
+annotation class ProductRef
+
+
 @Module
 @ExperimentalCoroutinesApi
 @InstallIn(SingletonComponent::class)
@@ -41,10 +46,14 @@ object FireStoreAppModule {
     @TodoRef //param type:FirebaseFirestore same with `provideOtherRef` fun
     @Provides
     fun provideTodosRef(db: FirebaseFirestore) = db.collection("todo_collection")
-
     @OtherRef //param type:FirebaseFirestore same with `provideTodosRef` fun
     @Provides
     fun provideOtherRef(db: FirebaseFirestore) = db.collection("other_collection")
+
+
+    @ProductRef
+    @Provides
+    fun provideProductRef(db: FirebaseFirestore) = db.collection("product_collection")
 
 
     // How to construct TodoRepository?

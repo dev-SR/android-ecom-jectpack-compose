@@ -8,7 +8,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
-import com.example.ecomzapp.navigations.screensInHomeFromBottomNav
+import com.my.ecomr.navigations.screensInHomeFromBottomNav
 import com.my.ecomr.ui.theme.color_60p_dark
 import com.my.ecomr.ui.theme.color_60p_light
 import com.my.ecomr.ui.theme.grad1_10p

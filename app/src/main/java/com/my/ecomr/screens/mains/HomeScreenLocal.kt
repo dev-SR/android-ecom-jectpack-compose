@@ -2,6 +2,7 @@
 
 package com.my.ecomr.screens.mains
 
+import android.content.res.Configuration
 import android.widget.Toast
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateDpAsState
@@ -26,117 +27,138 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-//import coil.compose.*
-//import coil.request.ImageRequest
-//import coil.transform.Transformation
-import com.my.ecomr.MainViewModel
+//import coil.compose.AsyncImage
 import com.my.ecomr.R
-import com.my.ecomr.Response
-import com.my.ecomr.domains.models.Product
-import com.my.ecomr.navigations.Screens
 import com.my.ecomr.ui.theme.*
-import com.skydoves.landscapist.coil.CoilImage
+
+class ProductLocal(
+    val id: String,
+    val name: String,
+    val price: Int,
+    val qty: Int,
+    val description: String,
+    val image_url: Int
+)
+
+val heroProduct = ProductLocal(
+    "id6",
+    "IPhone",
+    100,
+    10,
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+    R.drawable.id1
+)
+
+val listOfProduct = listOf<ProductLocal>(
+    ProductLocal(
+        "id1",
+        "IPhone 14 Pro Max 256GB",
+        100,
+        10,
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        R.drawable.id1
+
+    ),
+    ProductLocal(
+        "id2",
+        "IPhone",
+        100,
+        10,
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        R.drawable.id2
+
+    ),
+    ProductLocal(
+        "id3",
+        "IPhone",
+        100,
+        10,
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        R.drawable.id3
+
+
+    ),
+    ProductLocal(
+        "id4",
+        "IPhone",
+        100,
+        10,
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        R.drawable.id4
+    ),
+    ProductLocal(
+        "id5",
+        "IPhone",
+        100,
+        10,
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        R.drawable.id5
+    ),
+
+    ProductLocal(
+        "id6",
+        "IPhone",
+        100,
+        10,
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        R.drawable.id6
+    )
+)
+
+class CategoryLocal(val name: String, val isSelected: Boolean = false)
+
+val listOfCategory = listOf<CategoryLocal>(
+    CategoryLocal("All", isSelected = true),
+    CategoryLocal("Clothing"),
+    CategoryLocal("Cell Phones"),
+    CategoryLocal("Laptop"),
+    CategoryLocal("Accessory"),
+    CategoryLocal("Books")
+)
 
 @Composable
-fun HomeScreen(
-    navController: NavController, viewModel: MainViewModel
+fun HomeScreenLocal(
+    heroProductLocal: ProductLocal,
+    popularsNow: List<ProductLocal>,
+    topProductLocals: List<ProductLocal>,
+    categoryLocalList: List<CategoryLocal>,
+    goToCategory: () -> Unit = {},
+    goToDetails: () -> Unit = {},
+    seeAllPopular: () -> Unit = {},
+    seeAllTop: () -> Unit = {},
+    addToCart: () -> Unit = {},
 ) {
-    viewModel.setCurrentScreen(Screens.HomeScreens.Home)
-    val goToProductDetail: (Product)->Unit = {product:Product->
-        navController.navigate(
-            Screens.ProductScreens.Details.routeToDetailsOf(product.productId!!)
-        )
-    }
-    Home(viewModel.newArrivalProducts.value,viewModel.topProducts.value,viewModel.bestSellerProducts.value,goToProductDetail)
-
-}
-
-//val data:Response<List<Product>> = Response.Success(listOf( ))
 
 
-@Composable
-fun Home(
-    products: Response<List<Product>>,
-    topProducts: Response<List<Product>>,
-    bestSellerProducts: Response<List<Product>>,
-    goToProductDetail: (Product) -> Unit
-
-    ) {
     LazyColumn {
         item {
             Spacer(modifier = Modifier.height(60.dp))
-            when (products) {
-                is Response.Loading -> {
-                    HeroProduct(Product("New Arrival"))
-                }
-                is Response.Success -> {
-                    HeroProduct(products.data[0])
-                }
-                is Response.Error -> {
-                    HeroProduct(Product("New Arrival"))
-                }
-            }
-
+            HeroProductLocal(heroProductLocal)
         }
-        item { CategoriesLocal(listOfCategory) }
+        item { CategoriesLocal(categoryLocalList) }
         item {
-            TagLocal(s = "New Arrival")
+            TagLocal(s = "Popular Now")
         }
-        item {
-            when (products) {
-                is Response.Loading -> {
-                    CircularProgressIndicator()
-                }
-                is Response.Success -> {
-                    TopProducts(products.data,goToProductDetail)
-                }
-                is Response.Error -> {
-                    Text("Couldn't fetching data")
-                }
-            }
-        }
+        item { TopProductsLocal(topProductLocals) }
         item {
             TagLocal(s = "Top Products")
         }
-        item {
-            when (topProducts) {
-                is Response.Loading -> {
-                    CircularProgressIndicator()
-                }
-                is Response.Success -> {
-                    TopProducts(topProducts.data, goToProductDetail)
-                }
-                is Response.Error -> {
-                    Text("Couldn't fetching data")
-                }
-            }
-        }
+        item { TopProductsLocal(topProductLocals) }
         item {
             TagLocal(s = "Best Sellers")
         }
         item {
-            when (bestSellerProducts) {
-                is Response.Loading -> {
-                    CircularProgressIndicator()
-                }
-                is Response.Success -> {
-                    TopProducts(bestSellerProducts.data, goToProductDetail)
-                }
-                is Response.Error -> {
-                    Text("Couldn't fetching data")
-                }
-            }
+            TopProductsLocal(topProductLocals)
             Spacer(modifier = Modifier.height(100.dp))
         }
     }
 
 }
 
-
 @Composable
-fun Tag(s: String, seeAllPopular: () -> Unit = {}) {
+fun TagLocal(s: String, seeAllPopular: () -> Unit = {}) {
     val isLight = MaterialTheme.colors.isLight
     var textColor = if (isLight) Color.Black else Color.White
 
@@ -161,8 +183,8 @@ fun Tag(s: String, seeAllPopular: () -> Unit = {}) {
 }
 
 @Composable
-fun HeroProduct(
-    heroProduct: Product,
+fun HeroProductLocal(
+    heroProductLocal: ProductLocal,
     goToDetails: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -295,10 +317,19 @@ fun HeroProduct(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Categories(
+fun CategoriesLocal(
     categoryLocalList: List<CategoryLocal>,
     goToCategory: () -> Unit = {},
 ) {
+//    val configuration = LocalConfiguration.current
+//    val leftAndRightPads = 40
+//    val innerSpace = 20
+//    val availableWidth = configuration.screenWidthDp - (leftAndRightPads+innerSpace)
+////  convert to int
+//    val itemWidth = (availableWidth / 2)
+//    Log.d("itemWidth", itemWidth.toString())
+
+
     val context = LocalContext.current
 
     LazyRow(modifier = Modifier.padding(top = 10.dp, start = 10.dp, bottom = 10.dp)) {
@@ -359,8 +390,8 @@ fun Categories(
 }
 
 @Composable
-fun PopularNow(
-    popularsNow: List<Product>,
+fun PopularNowLocal(
+    popularsNow: List<ProductLocal>,
     goToDetails: () -> Unit = {},
 
     ) {
@@ -368,16 +399,19 @@ fun PopularNow(
 }
 
 @Composable
-fun TopProducts(
-    topProducts: List<Product>,
-    goToProductDetail: (Product) -> Unit,
-
+fun TopProductsLocal(
+    topProductLocals: List<ProductLocal>,
+    goToDetails: () -> Unit = {},
 
     ) {
     val context = LocalContext.current
+    val shuffledItems = remember(topProductLocals) {
+        topProductLocals.shuffled()
+    }
+
     LazyRow(modifier = Modifier.padding(top = 10.dp, start = 10.dp, bottom = 10.dp)) {
-        items(topProducts) { product ->
-            ProductCard(product, goToProductDetail)
+        items(shuffledItems) { product ->
+            ProductCardLocal(product, goToDetails)
         }
         item {
             ProductMoreCard()
@@ -385,23 +419,61 @@ fun TopProducts(
     }
 }
 
-
 @Composable
-fun ProductCard(
-    product: Product,
-    goToProductDetail: (Product) -> Unit,
-) {
-    val context = LocalContext.current
+fun ProductMoreCard(seeAll: () -> Unit = {}) {
     val isLight = MaterialTheme.colors.isLight
     val color_30p = if (isLight) color_30p_light else color_30p_dark
     Card(
         modifier = Modifier
             .size(width = 188.dp, height = 190.dp)
             .padding(horizontal = 10.dp),
+        elevation = 5.dp,
+        shape = RoundedCornerShape(10.dp),
+//                backgroundColor = Color.Transparent,
+        onClick = {
+            seeAll()
+        }
+    ) {
+        Box(
+            Modifier
+                .background(color_30p)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center,
+
+                ) {
+                Text(
+                    text = "See More",
+                    style = MaterialTheme.typography.body1,
+                    color = Color.Gray
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun ProductCardLocal(
+    product: ProductLocal,
+    goToDetails: () -> Unit = {},
+) {
+    val context = LocalContext.current
+    val isLight = MaterialTheme.colors.isLight
+    val color_30p = if (isLight) color_30p_light else color_30p_dark
+
+    Card(
+        modifier = Modifier
+            .size(width = 188.dp, height = 190.dp)
+            .padding(horizontal = 10.dp),
         elevation = 4.dp,
         shape = RoundedCornerShape(10.dp),
+//                backgroundColor = Color.Transparent
         onClick = {
-            goToProductDetail(product)
+            Toast.makeText(context, "Go to Details", Toast.LENGTH_SHORT).show()
         }
     ) {
         Box(
@@ -411,7 +483,7 @@ fun ProductCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(),
+                    .padding(4.dp),
             ) {
 
                 var imgSize by remember { mutableStateOf(0.dp) }
@@ -425,47 +497,17 @@ fun ProductCard(
                 LaunchedEffect(Unit) {
                     imgSize = 120.dp
                 }
-                CoilImage(
-                    imageModel = product.img!!,
+
+
+                Image(
+                    painter = painterResource(id = product.image_url),
+                    contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(imgSizeInDp)
-                        .padding(5.dp),
+                        .padding(start = 10.dp, end = 10.dp, top = 5.dp),
                     contentScale = ContentScale.Fit,
-                    // shows a shimmering effect when loading an image.
-//                    shimmerParams = ShimmerParams(
-//                        baseColor = color_30p,
-//                        highlightColor = Color.Gray,
-//                        durationMillis = 350,
-//                        dropOff = 0.65f,
-//                        tilt = 20f
-//                    ),
-                    // shows an error text message when request failed.
-                    failure = {
-                        Image(
-                            painter = painterResource(id = R.drawable.not_found),
-                            contentDescription = "error",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(imgSizeInDp)
-                                .padding(5.dp)
-                        )
-                    },
-                    loading = {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .fillMaxHeight(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
-                    }
                 )
-
-
 
                 Column(
                     modifier = Modifier
@@ -475,7 +517,7 @@ fun ProductCard(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(
-                        text = product.name!!,
+                        text = product.name,
                         style = MaterialTheme.typography.body1,
                         overflow = TextOverflow.Ellipsis,
                         maxLines = 1,
@@ -518,81 +560,37 @@ fun ProductCard(
                     contentDescription = "add",
                     modifier = Modifier.padding(5.dp),
                     tint = Color.White,
-                )
+
+                    )
             }
         }
     }
 }
 
-//@Composable
-//fun NetworkImage(
-//    url: String,
-//    contentDescription: String = "",
-//    modifier: Modifier,
-//    alignment: Alignment = Alignment.Center,
-//    contentScale: ContentScale = ContentScale.Fit,
-//    alpha: Float = DefaultAlpha,
-//    colorFilter: ColorFilter? = null,
-//    placeholderDrawableRes: Int? = null,
-//    crossFade: Int? = null,
-//    transformations: List<Transformation>? = null,
-//    onLoading: @Composable () -> Unit = {},
-//    onError: @Composable () -> Unit = {}
-//) {
-//    Box(
-//        modifier = modifier
-//    ) {
-//        val painter = rememberAsyncImagePainter(
-//            ImageRequest.Builder(LocalContext.current).data(data = url)
-//                .apply(block = fun ImageRequest.Builder.() {
-//                    placeholderDrawableRes?.let {
-//                        placeholder(R.drawable.placeholder)
-//                    }
-//                    error(
-//                        R.drawable.not_found
-//                    )
-//                    crossFade?.let {
-//                        crossfade(durationMillis = it)
-//                    }
-////                    transformations?.let {
-////                        transformations(transformations = it)
-////                    }
-//                }).build()
-//        )
-//        val imageState = painter.state
-//
-//        if (imageState is AsyncImagePainter.State.Loading) {
-////            onLoading()
-//            Row(
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .fillMaxHeight(),
-//                verticalAlignment = Alignment.CenterVertically,
-//                horizontalArrangement = Arrangement.Center
-//            ) {
-//                CircularProgressIndicator()
-//            }
-//        }
-//        if (imageState is AsyncImagePainter.State.Error) {
-////            onError()
-//            Image(
-//                painter = painter,
-//                contentDescription = contentDescription,
-//                contentScale = contentScale,
-//                modifier = modifier
-//            )
-//        }
-////        Image(
-////            painter = painter,
-////            contentDescription = contentDescription,
-////            contentScale = contentScale,
-////            alignment = alignment,
-////            alpha = alpha,
-////            colorFilter = colorFilter,
-////            modifier = modifier
-////        )
-//
-//
-//
-//    }
-//}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true,
+    name = "Dark Mode"
+)
+@Composable
+fun HomePreviewLocal() {
+
+
+    EcomTheme {
+        val isLight = MaterialTheme.colors.isLight
+        val color_60p = if (isLight) color_60p_light else color_60p_dark
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = color_60p
+        ) {
+            HomeScreenLocal(
+                heroProductLocal = heroProduct,
+                popularsNow = listOfProduct,
+                topProductLocals = listOfProduct,
+                categoryLocalList = listOfCategory,
+            )
+        }
+    }
+}

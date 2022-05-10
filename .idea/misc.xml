@@ -3,7 +3,10 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Others/Installations/Android/projects/Ecomr/app/src/main/res/drawable/ic_ecom_launcher.xml" value="0.2075" />
+        <entry key="..\:/Others/Installations/Android/projects/Ecomr/app/src/main/res/drawable/ic_ecom_launcher_3x.xml" value="0.2075" />
         <entry key="..\:/Others/Installations/Android/projects/Ecomr/app/src/main/res/drawable/ic_group_25.xml" value="0.124" />
+        <entry key="..\:/Others/Installations/Android/projects/Ecomr/app/src/main/res/drawable/ic_group_25x.xml" value="0.2075" />
       </map>
     </option>
   </component>
