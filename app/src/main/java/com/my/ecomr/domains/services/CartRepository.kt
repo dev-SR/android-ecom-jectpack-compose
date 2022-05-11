@@ -49,16 +49,25 @@ class CartRepository @Inject constructor(
     fun removeOneFromCart(cart: CartItem) {
         cartRef.document(cart.cartId!!).delete()
     }
+
     private fun removeOneFromCartById(cartId: String) {
         cartRef.document(cartId).delete()
     }
+
     fun removeSelectedFromCart(ids: List<String>) {
         ids.forEach {
             removeOneFromCartById(it)
         }
     }
 
-    fun addToCart(productId: String, qty: Int) {
-//        cartRef.add()
+    suspend fun addToCart(productId: String, userId: String, qty: Int = 1) = flow {
+        try {
+            emit(Response.Loading)
+            val cart = CartItem(productId = productId, userId = userId, qty = qty)
+            cartRef.add(cart).await()
+            emit(Response.Success(cart))
+        } catch (e: Exception) {
+            emit(Response.Error(e.message ?: e.toString()))
+        }
     }
 }

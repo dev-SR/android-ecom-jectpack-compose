@@ -244,7 +244,10 @@ class MainViewModel @Inject constructor(
 
     fun addToCart(productId: String, qty: Int = 1) {
         viewModelScope.launch {
-            cartRepository.addToCart(productId, qty)
+            val userId = authRepository.getCurrentUser()?.userId!!
+            cartRepository.addToCart(productId, userId = userId, qty = qty).collect { response ->
+
+            }
         }
     }
 
