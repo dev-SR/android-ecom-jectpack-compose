@@ -15,6 +15,6 @@
 ## Demo
 
 <div align="center">
-<img src="img/demo.gif" alt="demo.gif" width="400px">
+<img src="img/demo.gif" alt="demo.gif" width="380px">
 </div>
 
