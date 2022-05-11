@@ -16,6 +16,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,12 +45,32 @@ fun HomeScreen(
     navController: NavController, viewModel: MainViewModel
 ) {
     viewModel.setCurrentScreen(Screens.HomeScreens.Home)
-    val goToProductDetail: (Product)->Unit = {product:Product->
+    val goToProductDetail: (Product) -> Unit = { product: Product ->
         navController.navigate(
             Screens.ProductScreens.Details.routeToDetailsOf(product.productId!!)
         )
     }
-    Home(viewModel.newArrivalProducts.value,viewModel.topProducts.value,viewModel.bestSellerProducts.value,goToProductDetail)
+    val addToCart: (String) -> Unit = { productId ->
+//        viewModel.addToCart(productId)
+        if (!viewModel.isLoggedIn.value) {
+            navController.navigate(
+                route = Screens.AuthScreens.Login.reroute(
+                    "cart",
+                    productId = productId
+                )
+            )
+        } else {
+            navController.navigate(route = Screens.HomeScreens.Cart.addNewProductToCart(productId))
+        }
+
+    }
+    Home(
+        viewModel.newArrivalProducts.value,
+        viewModel.topProducts.value,
+        viewModel.bestSellerProducts.value,
+        goToProductDetail,
+        addToCart
+    )
 
 }
 
@@ -61,18 +82,21 @@ fun Home(
     products: Response<List<Product>>,
     topProducts: Response<List<Product>>,
     bestSellerProducts: Response<List<Product>>,
-    goToProductDetail: (Product) -> Unit
+    goToProductDetail: (Product) -> Unit,
+    addToCart: (String) -> Unit
 
-    ) {
+) {
     LazyColumn {
         item {
-            Spacer(modifier = Modifier.height(60.dp))
+            TopBarHome()
+        }
+        item {
             when (products) {
                 is Response.Loading -> {
                     HeroProduct(Product("New Arrival"))
                 }
                 is Response.Success -> {
-                    HeroProduct(products.data[0])
+                    HeroProduct(products.data[0], goToProductDetail)
                 }
                 is Response.Error -> {
                     HeroProduct(Product("New Arrival"))
@@ -87,10 +111,16 @@ fun Home(
         item {
             when (products) {
                 is Response.Loading -> {
-                    CircularProgressIndicator()
+                    Column(
+                        modifier = Modifier.height(200.dp),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
                 is Response.Success -> {
-                    TopProducts(products.data,goToProductDetail)
+                    TopProducts(products.data, goToProductDetail, addToCart)
                 }
                 is Response.Error -> {
                     Text("Couldn't fetching data")
@@ -103,10 +133,16 @@ fun Home(
         item {
             when (topProducts) {
                 is Response.Loading -> {
-                    CircularProgressIndicator()
+                    Column(
+                        modifier = Modifier.height(200.dp),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
                 is Response.Success -> {
-                    TopProducts(topProducts.data, goToProductDetail)
+                    TopProducts(topProducts.data, goToProductDetail, addToCart)
                 }
                 is Response.Error -> {
                     Text("Couldn't fetching data")
@@ -119,10 +155,16 @@ fun Home(
         item {
             when (bestSellerProducts) {
                 is Response.Loading -> {
-                    CircularProgressIndicator()
+                    Column(
+                        modifier = Modifier.height(200.dp),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
                 is Response.Success -> {
-                    TopProducts(bestSellerProducts.data, goToProductDetail)
+                    TopProducts(bestSellerProducts.data, goToProductDetail, addToCart)
                 }
                 is Response.Error -> {
                     Text("Couldn't fetching data")
@@ -132,6 +174,41 @@ fun Home(
         }
     }
 
+}
+
+@Composable
+fun TopBarHome() {
+    val isLight = MaterialTheme.colors.isLight
+    val color_60p = if (isLight) color_60p_light else color_60p_dark
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 20.dp, bottom = 0.dp, start = 20.dp, end = 20.dp),
+        shape = RoundedCornerShape(8.dp),
+        elevation = 0.dp,
+        backgroundColor = color_60p
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Text(
+                text = "Search Products...", modifier = Modifier.padding(horizontal = 20.dp),
+                style = MaterialTheme.typography.body2,
+                color = Color.Gray
+            )
+            IconButton(
+                onClick = { /*TODO*/ },
+                modifier = Modifier.padding(end = 10.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Search, contentDescription = "",
+                    tint = Color.Gray
+                )
+            }
+        }
+
+    }
 }
 
 
@@ -163,12 +240,12 @@ fun Tag(s: String, seeAllPopular: () -> Unit = {}) {
 @Composable
 fun HeroProduct(
     heroProduct: Product,
-    goToDetails: () -> Unit = {},
+    goToProductDetail: (Product) -> Unit = {}
 ) {
     val context = LocalContext.current
     Box(
         modifier = Modifier
-            .padding(20.dp),
+            .padding(top = 0.dp, bottom = 20.dp, start = 20.dp, end = 20.dp)
     ) {
         Card(
             shape = RoundedCornerShape(15.dp),
@@ -178,8 +255,7 @@ fun HeroProduct(
                 .padding(top = 40.dp),
             backgroundColor = Color.Transparent,
             onClick = {
-                goToDetails()
-                Toast.makeText(context, "Hero Card Clicked", Toast.LENGTH_SHORT).show()
+                goToProductDetail(heroProduct)
             }
         ) {
             Box(
@@ -241,7 +317,7 @@ fun HeroProduct(
                             shape = RoundedCornerShape(7.dp),
                             border = BorderStroke(1.dp, Color.White),
                             onClick = {
-                                goToDetails()
+//                                goToDetails()
                                 Toast.makeText(context, "Buy Now Clicked", Toast.LENGTH_SHORT)
                                     .show()
                             }
@@ -371,13 +447,14 @@ fun PopularNow(
 fun TopProducts(
     topProducts: List<Product>,
     goToProductDetail: (Product) -> Unit,
+    addToCart: (String) -> Unit
 
 
-    ) {
+) {
     val context = LocalContext.current
     LazyRow(modifier = Modifier.padding(top = 10.dp, start = 10.dp, bottom = 10.dp)) {
         items(topProducts) { product ->
-            ProductCard(product, goToProductDetail)
+            ProductCard(product, goToProductDetail, addToCart)
         }
         item {
             ProductMoreCard()
@@ -390,6 +467,7 @@ fun TopProducts(
 fun ProductCard(
     product: Product,
     goToProductDetail: (Product) -> Unit,
+    addToCart: (String) -> Unit
 ) {
     val context = LocalContext.current
     val isLight = MaterialTheme.colors.isLight
@@ -504,13 +582,7 @@ fun ProductCard(
                     )
                     .background(color_10p)
                     .clickable {
-//                                goToDetails()
-                        Toast
-                            .makeText(
-                                context,
-                                "Add To Cart", Toast.LENGTH_SHORT
-                            )
-                            .show()
+                        addToCart(product.productId!!)
                     },
             ) {
                 Icon(

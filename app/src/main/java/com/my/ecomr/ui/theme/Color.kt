@@ -12,9 +12,8 @@ val Purple500 = Color(0xFF6200EE)
 val Purple700 = Color(0xFF3700B3)
 val Teal200 = Color(0xFF03DAC5)
 
-val grad1_10p = Color(0xFFFC6B43)
 val starColor = Color(0xFFFFC107)
-
+val grad1_10p = Color(0xFFFC6B43)
 val grad2_10p= Color(0xFFE64526)
 val color_10p_light = Color(0xFFEC3916)
 

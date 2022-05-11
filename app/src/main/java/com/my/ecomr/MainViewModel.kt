@@ -206,6 +206,7 @@ class MainViewModel @Inject constructor(
             cartRepository.getCartInfo(user?.userId!!).collect { response ->
                 when (response) {
                     is Response.Success -> {
+                        _cartInfo.value = Response.Loading
                         val carts = response.data
                         val ids = mutableListOf<String>()
                         response.data.forEach {

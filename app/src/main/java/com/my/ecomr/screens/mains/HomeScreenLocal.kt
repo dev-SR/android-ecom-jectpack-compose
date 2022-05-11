@@ -190,7 +190,7 @@ fun HeroProductLocal(
     val context = LocalContext.current
     Box(
         modifier = Modifier
-            .padding(20.dp),
+            .padding(horizontal = 20.dp, vertical = 0.dp)
     ) {
         Card(
             shape = RoundedCornerShape(15.dp),

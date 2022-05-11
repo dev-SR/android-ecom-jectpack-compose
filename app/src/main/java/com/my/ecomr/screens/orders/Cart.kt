@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -199,9 +200,10 @@ fun CartItemCard(
 ) {
     val isLight = MaterialTheme.colors.isLight
     val color_60p = if (isLight) color_60p_light else color_60p_dark
+    var textColor = if (isLight) Color.Black else Color.White
 
     val color = if (isSelected)
-        Color(0xFFDE3163) else Color(0xFF7BB661)
+        grad2_10p else grad1_10p
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -227,7 +229,8 @@ fun CartItemCard(
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 5.dp),
-                color = color_10p_light
+                color = textColor,
+                overflow = TextOverflow.Ellipsis,
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
                 IconButton(
