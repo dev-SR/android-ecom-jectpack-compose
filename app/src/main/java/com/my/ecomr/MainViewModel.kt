@@ -2,21 +2,27 @@ package com.my.ecomr
 
 import android.util.Log
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.my.ecomr.domains.models.Todo
 import com.my.ecomr.domains.services.TodoRepository
 import com.my.ecomr.navigations.Screens
 import com.google.firebase.auth.AuthCredential
+import com.my.ecomr.domains.models.CartItem
 import com.my.ecomr.domains.models.Product
 import com.my.ecomr.domains.models.User
 import com.my.ecomr.domains.services.AuthRepository
+import com.my.ecomr.domains.services.CartRepository
 import com.my.ecomr.domains.services.ProductRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -25,16 +31,12 @@ import javax.inject.Inject
 
 //data class User(var id: String, var name: String)
 //data class Product(var id: String, var name: String)
-//data class CartItem(var product: Product, var qty: Int)
+//data class CartItem(var productId: Product, var qty: Int)
 //data class CartInfo(var userid: String, var cartItems: MutableList<CartItem>)
 
 //val user = User("1", "Jhon")
 
-class CartService @Inject constructor() {
-    init {
-        Log.d("injected", "Injected")
-    }
-}
+
 
 sealed class Response<out T> {
     object Loading : Response<Nothing>()
@@ -53,7 +55,9 @@ class MainViewModel @Inject constructor(
 //    private val cartService: CartService,
     private val todoRepository: TodoRepository,
     private val authRepository: AuthRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val cartRepository: CartRepository
+
 ) : ViewModel() {
     private val _isLoggedIn = mutableStateOf(false)
     val isLoggedIn: State<Boolean> = _isLoggedIn
@@ -81,6 +85,20 @@ class MainViewModel @Inject constructor(
     private val _loading = MutableStateFlow(true)
     val loading: StateFlow<Boolean> = _loading.asStateFlow()
 
+    private val _selectedCarts = mutableStateOf<MutableList<String>>(mutableListOf())
+    val selectedCarts: State<List<String>> = _selectedCarts
+
+//    private val _selectedCarts2 = mutableStateListOf<String>()
+//    val selectedCarts2: SnapshotStateList<String> = _selectedCarts2
+
+
+    private val _cartInfo = mutableStateOf<Response<List<CartItem>>>(Response.Success(emptyList()))
+    val cartInfo: State<Response<List<CartItem>>> = _cartInfo
+    private val _cartInfoIds = mutableStateOf<MutableList<String>>(
+        mutableListOf()
+    )
+    val cartInfoIds: State<List<String>> = _cartInfoIds
+
 
 //    private val _cartInfo = mutableStateOf<CartInfo?>(null)
 //    val cartInfo: State<CartInfo?> = _cartInfo
@@ -97,8 +115,9 @@ class MainViewModel @Inject constructor(
         if (user != null) {
             _isLoggedIn.value = true
             _user.value = user
+            Log.d("trace:user", user.toString())
         }
-        getProducts()
+        getNewArrivalProducts()
         getTopProducts()
         getBestSellers()
     }
@@ -122,39 +141,113 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    private fun getProducts() {
-        viewModelScope.launch {
+    private fun getNewArrivalProducts() {
+        viewModelScope.launch(Dispatchers.IO) {
             productRepository.getProductsFromFirestore().collect { response ->
-                _newArrivalProducts.value = response
+                withContext(Dispatchers.Main) {
+                    _newArrivalProducts.value = response
+                }
             }
         }
     }
 
     private fun getTopProducts() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             productRepository.getTopProducts().collect { response ->
-                _topProducts.value = response
+                withContext(Dispatchers.Main) {
+                    _topProducts.value = response
+                }
             }
         }
     }
 
     private fun getBestSellers() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             productRepository.getBestSeller().collect { response ->
-                _bestSellerProducts.value = response
+                withContext(Dispatchers.Main) {
+                    _bestSellerProducts.value = response
+                }
             }
         }
     }
 
     fun getProduct(productId: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             productRepository.getProduct(productId).collect { response ->
-                _product.value = response
+                withContext(Dispatchers.Main) {
+                    _product.value = response
+                }
             }
         }
-
-
     }
+
+    private fun getProductsByIds(ids: List<String>) {
+        viewModelScope.launch {
+            Log.d("trace:ids", ids.toString())
+            productRepository.getProductsByIds(ids).collect { response ->
+                Log.d("trace:response", response.toString())
+                when (response) {
+                    is Response.Success -> {
+                        response.data.forEach {
+                            CartItem()
+                        }
+                    }
+                    else -> {
+                        Log.d("trace:products", "error")
+                    }
+                }
+            }
+        }
+    }
+
+    fun getCartInfo() {
+        viewModelScope.launch {
+            val user = authRepository.getCurrentUser()
+            cartRepository.getCartInfo(user?.userId!!).collect { response ->
+                when (response) {
+                    is Response.Success -> {
+                        val carts = response.data
+                        val ids = mutableListOf<String>()
+                        response.data.forEach {
+                            it.productId?.let { it1 -> ids.add(it1) }
+                        }
+                        val cartInfo = mutableListOf<CartItem>()
+                        productRepository.getProductsByIds(ids).collect { response ->
+                            when (response) {
+                                is Response.Success -> {
+                                    response.data.forEach { product ->
+                                        //find cart item with product id = it.productId
+                                        val cartItem =
+                                            carts.find { it.productId == product.productId }
+                                        val newCartItem = CartItem(
+                                            cartId = cartItem?.cartId,
+                                            productId = cartItem?.productId,
+                                            product = product,
+                                            qty = cartItem?.qty,
+                                            userId = cartItem?.userId
+                                        )
+                                        cartInfo.add(newCartItem)
+                                    }
+                                    _cartInfo.value = Response.Success(cartInfo)
+                                }
+                                else -> {
+                                    Log.d("trace:products", "error")
+                                }
+                            }
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    fun addToCart(productId: String, qty: Int = 1) {
+        viewModelScope.launch {
+            cartRepository.addToCart(productId, qty)
+        }
+    }
+
 
     private val _currentScreen = MutableStateFlow<Screens>(Screens.HomeScreens.Home)
     val currentScreen: StateFlow<Screens> = _currentScreen.asStateFlow()
@@ -165,85 +258,27 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun increaseQty(cart: CartItem) {
+        cartRepository.increaseQty(cart)
+    }
 
-//    fun addToCart(user: User, product: Product, qty: Int) {
-//        viewModelScope.launch {
-//            val existing = cartInfo.value;
-//            if (existing == null) {
-//                val cartItem = CartItem(product = product, qty = qty)
-//                val newCartInfo = CartInfo(user.id, mutableListOf(cartItem))
-////                Log.d("debug", newCartInfo.toString())
-//                _cartInfo.value = newCartInfo
-//            } else {
-//                if (existing!!.userid == user.id) {
-//                    //find if product already exists in cart
-//                    val cartItem = existing.cartItems.find { it.product.id == product.id }
-//                    if (cartItem != null) {
-//                        //update existing cart item
-//                        val updatedCartItems = existing.cartItems.map {
-//                            if (it.product.id == product.id) {
-//                                it.copy(qty = it.qty + qty)
-//                            } else {
-//                                it
-//                            }
-//                        }
-//                        val updatedCartInfo =
-//                            existing.copy(cartItems = updatedCartItems as MutableList<CartItem>)
-//                        _cartInfo.value = updatedCartInfo
-//                    } else {
-//                        //add new cart item
-//                        val newCartItem = CartItem(product, qty)
-//                        existing.cartItems.add(newCartItem)
-//                        _cartInfo.value = existing
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    fun increaseQty(product: Product, user: User) {
-//        viewModelScope.launch {
-//            var cartInfo = cartInfo.value
-//
-//            if (user.id == cartInfo?.userid) {
-//                var cartItems = cartInfo.cartItems.map {
-//                    if (it.product.id == product.id) {
-////                        WATCH OUT
-////                        it.qty += 1
-////                        it
-//                        /**
-//                         * Mutable state cannot check if the state of your internal object has changed,
-//                         * it can only check if it is the same object or not.so we need create new `CartItem`
-//                         * with updated `qty` value
-//                         *
-//                         * */
-//                        CartItem(it.product, it.qty + 1)
-//                    } else
-//                        it
-//                }
-//                _cartInfo.value = cartInfo.copy(cartItems = cartItems as MutableList<CartItem>)
-//            }
-//        }
-//    }
-//
-//    fun decreaseQty(product: Product, user: User) {
-//        viewModelScope.launch {
-//            var cartInfo = cartInfo.value
-//            if (user.id == cartInfo?.userid) {
-//                var cartItems = cartInfo.cartItems.map {
-//                    if (it.product.id == product.id) {
-//                        var qty = it.qty
-//                        if (qty > 0) {
-//                            qty -= 1
-//                        }
-//                        CartItem(it.product, qty = qty)
-//                    } else
-//                        it
-//
-//                }
-//                _cartInfo.value = cartInfo.copy(cartItems = cartItems as MutableList<CartItem>)
-//            }
-//        }
-//    }
+    fun decreaseQty(cart: CartItem) {
+        cartRepository.decreaseQty(cart)
+    }
 
+    fun removeSelectedFromCart() {
+        cartRepository.removeSelectedFromCart(selectedCarts.value)
+    }
+
+    fun selectOrDeselect(cartId: String) {
+            val selected = _selectedCarts.value
+            val alreadySelected = selected.contains(cartId)
+            if (!alreadySelected) {
+//                selected.add(cartId)
+                _selectedCarts.value = (selected + mutableListOf(cartId)) as MutableList<String>
+            } else {
+//                selected.remove(cartId)
+                _selectedCarts.value = selected.toMutableList().also { it.remove(cartId) }
+            }
+    }
 }

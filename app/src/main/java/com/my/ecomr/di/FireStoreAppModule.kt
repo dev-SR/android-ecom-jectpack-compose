@@ -31,6 +31,10 @@ annotation class OtherRef
 @Qualifier
 @Retention(AnnotationRetention.BINARY)
 annotation class ProductRef
+@Qualifier
+
+@Retention(AnnotationRetention.BINARY)
+annotation class CartRef
 
 
 @Module
@@ -54,6 +58,10 @@ object FireStoreAppModule {
     @ProductRef
     @Provides
     fun provideProductRef(db: FirebaseFirestore) = db.collection("product_collection")
+
+    @CartRef
+    @Provides
+    fun  provideCartRef(db: FirebaseFirestore) = db.collection("cart_collection")
 
 
     // How to construct TodoRepository?

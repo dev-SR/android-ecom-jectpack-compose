@@ -24,7 +24,8 @@ class AuthRepository @Inject constructor(
             User(
                 firebaseUser.email!!,
                 firebaseUser.displayName!!,
-                firebaseUser.photoUrl?.toString()
+                firebaseUser.photoUrl?.toString(),
+                firebaseUser.uid
             )
         } else
             null

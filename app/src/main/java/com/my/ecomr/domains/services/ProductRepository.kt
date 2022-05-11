@@ -2,6 +2,7 @@ package com.my.ecomr.domains.services
 
 import android.util.Log
 import com.google.firebase.firestore.CollectionReference
+import com.google.firebase.firestore.FieldPath
 import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
@@ -61,8 +62,141 @@ class ProductRepository @Inject constructor(
 
             emit(Response.Error("Product not found"))
         }
-
     }
 
-//        emit(Response.Success(product))
+
+    suspend fun getProductsByIds(ids: List<String>) = flow{
+        emit(Response.Loading)
+        val products = productRef.whereIn(FieldPath.documentId(), ids).get().await().toObjects<Product>()
+        emit(Response.Success(products))
+    }
+
+    suspend fun getProductsByCondition(conditions: MutableMap<String, MutableMap<String, Any>>) = flow {
+        emit(Response.Loading)
+//      Compound queries
+        var query = productRef
+//        query = query.whereEqualTo("category", "Electronics") as CollectionReference
+
+        //        var conditionType = conditions.keys
+        conditions.keys.forEach {
+            when (it) {
+                "=" -> {
+                    conditions[it]?.forEach {
+                        val field = it.key
+                        val value = it.value
+                        query.whereEqualTo(field, value)
+                    }
+                }
+                "in" -> {
+                    conditions[it]?.forEach {
+                        val field = it.key
+                        val value = it.value as List<*>
+                        query.whereIn(field, value)
+                    }
+                }
+            }
+        }
+
+        val products = query.get().await().toObjects<Product>()
+        emit(Response.Success(products))
+    }
 }
+
+/*
+
+val condition: MutableMap<String, MutableMap<String, Any>> = mutableMapOf(
+    "=" to mutableMapOf(
+        "name" to "soikat",
+        "age" to 20
+    ),
+    "in" to mutableMapOf(
+        "name" to listOf("soikat", "soikat2"),
+    ),
+    ">" to mutableMapOf(
+        "age" to 20
+    ),
+    "<" to mutableMapOf(
+        "age" to 30
+    ),
+    ">=" to mutableMapOf(
+        "age" to 30
+    ),
+    "<=" to mutableMapOf(
+        "age" to 20
+    ),
+    "!=" to mutableMapOf(
+        "name" to "soikat2"
+    ),
+    "!in" to mutableMapOf(
+        "name" to listOf("soikat2", "soikat3")
+    ),
+)
+
+
+fun main() {
+    println("Hello, world!")
+    var conditionType = condition.keys
+    println(conditionType)
+    condition.keys.forEach {
+        when (it) {
+            "=" -> {
+                condition[it]?.forEach {
+                    val field = it.key
+                    val value = it.value
+                    println("$field = $value")
+                }
+            }
+            "in" -> {
+                condition[it]?.forEach {
+                    val field = it.key
+                    val value = it.value
+                    println("$field in $value")
+                }
+            }
+            ">" -> {
+                condition[it]?.forEach {
+                    val field = it.key
+                    val value = it.value
+                    println("$field > $value")
+                }
+            }
+            "<" -> {
+                condition[it]?.forEach {
+                    val field = it.key
+                    val value = it.value
+                    println("$field < $value")
+                }
+            }
+            ">=" -> {
+                condition[it]?.forEach {
+                    val field = it.key
+                    val value = it.value
+                    println("$field >= $value")
+                }
+            }
+            "<=" -> {
+                condition[it]?.forEach {
+                    val field = it.key
+                    val value = it.value
+                    println("$field <= $value")
+                }
+            }
+            "!=" -> {
+                condition[it]?.forEach {
+                    val field = it.key
+                    val value = it.value
+                    println("$field != $value")
+                }
+            }
+            "!in" -> {
+                condition[it]?.forEach {
+                    val field = it.key
+                    val value = it.value
+                    println("$field !in $value")
+                }
+            }
+        }
+    }
+}
+
+*/
