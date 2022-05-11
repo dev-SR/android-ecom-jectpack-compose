@@ -199,7 +199,8 @@ class MainViewModel @Inject constructor(
             }
         }
     }
-
+    private val _empty = mutableStateOf(true)
+    val empty : State<Boolean> = _empty
     fun getCartInfo() {
         viewModelScope.launch {
             val user = authRepository.getCurrentUser()
@@ -207,6 +208,7 @@ class MainViewModel @Inject constructor(
                 when (response) {
                     is Response.Success -> {
                         _cartInfo.value = Response.Loading
+                        _empty.value = false
                         val carts = response.data
                         val ids = mutableListOf<String>()
                         response.data.forEach {

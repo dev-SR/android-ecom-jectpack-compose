@@ -99,7 +99,7 @@ fun DetailsScreen(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center
             ) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(color = grad1_10p)
             }
         }
         is Response.Success -> {
@@ -283,7 +283,7 @@ fun ProfileToolBar(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(color = grad1_10p)
                         }
                     }
                 )
@@ -464,7 +464,7 @@ fun Review(review: Review) {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(color = grad1_10p)
 
                         }
                     }

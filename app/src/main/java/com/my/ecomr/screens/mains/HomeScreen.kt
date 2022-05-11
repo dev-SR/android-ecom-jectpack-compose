@@ -112,15 +112,15 @@ fun Home(
             when (products) {
                 is Response.Loading -> {
                     Column(
-                        modifier = Modifier.height(200.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                        verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(color = grad1_10p)
                     }
                 }
                 is Response.Success -> {
-                    TopProducts(products.data, goToProductDetail, addToCart)
+                    ProductsLists(products.data, goToProductDetail, addToCart)
                 }
                 is Response.Error -> {
                     Text("Couldn't fetching data")
@@ -134,15 +134,15 @@ fun Home(
             when (topProducts) {
                 is Response.Loading -> {
                     Column(
-                        modifier = Modifier.height(200.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                        verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(color = grad1_10p)
                     }
                 }
                 is Response.Success -> {
-                    TopProducts(topProducts.data, goToProductDetail, addToCart)
+                    ProductsLists(topProducts.data, goToProductDetail, addToCart)
                 }
                 is Response.Error -> {
                     Text("Couldn't fetching data")
@@ -156,15 +156,15 @@ fun Home(
             when (bestSellerProducts) {
                 is Response.Loading -> {
                     Column(
-                        modifier = Modifier.height(200.dp),
-                        verticalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier.fillMaxWidth().height(200.dp),
+                        verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(color = grad1_10p)
                     }
                 }
                 is Response.Success -> {
-                    TopProducts(bestSellerProducts.data, goToProductDetail, addToCart)
+                    ProductsLists(bestSellerProducts.data, goToProductDetail, addToCart)
                 }
                 is Response.Error -> {
                     Text("Couldn't fetching data")
@@ -444,7 +444,7 @@ fun PopularNow(
 }
 
 @Composable
-fun TopProducts(
+fun ProductsLists(
     topProducts: List<Product>,
     goToProductDetail: (Product) -> Unit,
     addToCart: (String) -> Unit
@@ -538,7 +538,7 @@ fun ProductCard(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ) {
-                            CircularProgressIndicator()
+                            CircularProgressIndicator(color = grad1_10p)
                         }
                     }
                 )

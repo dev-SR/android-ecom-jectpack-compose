@@ -80,14 +80,17 @@ fun CartScreen(
     }
     when (viewModel.cartInfo.value) {
         is Response.Loading -> {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Center
-            ) {
-                CircularProgressIndicator()
+            if(!viewModel.empty.value){
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .fillMaxHeight(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator(color = grad1_10p)
+
+                }
             }
         }
         is Response.Success -> {
